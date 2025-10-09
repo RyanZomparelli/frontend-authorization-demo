@@ -4,6 +4,7 @@ import Ducks from "./Ducks";
 import Login from "./Login";
 import MyProfile from "./MyProfile";
 import Register from "./Register";
+import ProtectedRoute from "./ProtectedRoute";
 import "./styles/App.css";
 
 function App() {
@@ -12,8 +13,25 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/ducks" element={<Ducks />} />
-      <Route path="/my-profile" element={<MyProfile />} />
+      {/* Wrap Ducks and MyProfile in ProtectedRoute and pass isLoggedIn a prop. */}
+      <Route
+        path="/ducks"
+        element={
+          <ProtectedRoute isLoggedin={isLoggedIn}>
+            <Ducks />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-profile"
+        element={
+          <ProtectedRoute isLoggedin={isLoggedIn}>
+            <MyProfile />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/login"
         element={
@@ -33,7 +51,7 @@ function App() {
       {/* Catch all route for non existing endpoints */}
       {/* Wildcard catch all symbol '*' */}
       {/* Using a ternary operator to render a Navigate component that redirects
-          the user  to the appropritate route depending on the user's authorization. 
+          the user to the appropritate route depending on the user's authorization. 
           Use the replace prop to avoid sending users in a redirection loop when
           they click the back button in the browser.  */}
       <Route
