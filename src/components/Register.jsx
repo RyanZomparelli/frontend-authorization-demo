@@ -3,7 +3,9 @@ import { useState } from "react";
 import Logo from "./Logo";
 import "./styles/Register.css";
 
-const Register = () => {
+const Register = ({ handleRegistration }) => {
+  // The inputs are controlled by a single object called data that lets us avoid
+  // writing separate change handlers for each input.
   const [data, setData] = useState({
     username: "",
     email: "",
@@ -19,11 +21,19 @@ const Register = () => {
     }));
   };
 
+  // Here we call the handler from App that we recieved as a prop and pass it the
+  // form data thats controlled right here in Register.
+  // Add this handler to the forms onSubmit attribute.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleRegistration(data);
+  };
+
   return (
     <div className="register">
       <Logo title={"CryptoDucks"} />
       <p className="register__welcome">Please register.</p>
-      <form className="register__form">
+      <form className="register__form" onSubmit={handleSubmit}>
         <label htmlFor="username">Username:</label>
         <input
           id="username"
