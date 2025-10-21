@@ -3,7 +3,8 @@ import { useState } from "react";
 import Logo from "./Logo";
 import "./styles/Login.css";
 
-const Login = () => {
+// Destructure the prop.
+const Login = ({ handleLogin }) => {
   const [data, setData] = useState({
     username: "",
     password: "",
@@ -17,6 +18,12 @@ const Login = () => {
     }));
   };
 
+  // handleSubmit prevents the default browser behavior and calls the login handler.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleLogin(data);
+  };
+
   return (
     <div className="login">
       <Logo title={"CryptoDucks"} />
@@ -24,7 +31,8 @@ const Login = () => {
         This app contains highly sensitive information. Please sign in or
         register to access CryptoDucks.
       </p>
-      <form className="login__form">
+      {/* Add the submission handler as the form's onSubmit attribute. */}
+      <form className="login__form" onSubmit={handleSubmit}>
         <label htmlFor="username">Login:</label>
         <input
           id="username"

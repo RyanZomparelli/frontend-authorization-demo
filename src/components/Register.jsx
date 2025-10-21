@@ -13,6 +13,9 @@ const Register = ({ handleRegistration }) => {
     confirmPassword: "",
   });
 
+  // When you pass a function to a setter function like setData, React automatically
+  // provides you with the current value of the corresponding state. Here we call
+  // it prevData.
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData((prevData) => ({

@@ -11,6 +11,11 @@ import "./styles/App.css";
 function App() {
   // State to manage authorization
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // State to update MyProfile component.
+  const [userData, setUserData] = useState({
+    username: "",
+    email: "",
+  });
 
   // useNavigate is a function that allows you to redirerct users at a certain time.
   // Navigate is a component that redirects users under certain circumstances like
@@ -37,6 +42,28 @@ function App() {
     }
   };
 
+  // handleLogin takes one parameter: an object with two properties.
+  const handleLogin = ({ username, password }) => {
+    // If the usename or the password is empty, return without sending a request.
+    if (!username || !password) {
+      return;
+    }
+
+    // We pass the username and password as positional arguments. The  authorize
+    // function is set up to rename 'usename' to 'identifier' before sneding a
+    // request to the server, because that is what is the API is expecting.
+    auth
+      .authorize(username, password)
+      .then((data) => {
+        if (data.jwt) {
+          setUserData(data.user); // save user's data to state
+          setIsLoggedIn(true); // log the user in
+          navigate("/ducks"); // send them to /ducks
+        }
+      })
+      .catch(console.err);
+  };
+
   return (
     <Routes>
       {/* Wrap Ducks and MyProfile in ProtectedRoute and pass isLoggedIn a prop. */}
@@ -53,16 +80,17 @@ function App() {
         path="/my-profile"
         element={
           <ProtectedRoute isLoggedin={isLoggedIn}>
-            <MyProfile />
+            <MyProfile userData={userData} />
           </ProtectedRoute>
         }
       />
 
+      {/* Pass the handler to the Login component. */}
       <Route
         path="/login"
         element={
           <div className="loginContainer">
-            <Login />
+            <Login handleLogin={handleLogin} />
           </div>
         }
       />
