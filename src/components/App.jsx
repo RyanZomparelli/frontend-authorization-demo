@@ -1,11 +1,13 @@
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Ducks from "./Ducks";
 import Login from "./Login";
 import MyProfile from "./MyProfile";
 import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
 import * as auth from "../utils/auth";
+import * as api from "../utils/api";
+import { setToken, getToken } from "../utils/token";
 import "./styles/App.css";
 
 function App() {
@@ -56,6 +58,8 @@ function App() {
       .authorize(username, password)
       .then((data) => {
         if (data.jwt) {
+          // Save the token to localStorage.
+          setToken(data.jwt);
           setUserData(data.user); // save user's data to state
           setIsLoggedIn(true); // log the user in
           navigate("/ducks"); // send them to /ducks
@@ -63,6 +67,27 @@ function App() {
       })
       .catch(console.err);
   };
+
+  // Use an EMPTY dependency array to run once upon page load.
+  useEffect(() => {
+    // Upon inital page load, check localStorage for a token.
+    const jwt = getToken();
+
+    if (!jwt) {
+      return;
+    }
+
+    api
+      .getUserInfo(jwt)
+      .then(({ username, email }) => {
+        // If the response is successful, log the user in, save their
+        // data to state, and navigate them to /ducks.
+        setIsLoggedIn(true);
+        setUserData({ username, email });
+        navigate("/ducks");
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <Routes>

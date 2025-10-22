@@ -1,4 +1,4 @@
-export const BASE_URL = "https://api.nomoreparties.co";
+import { BASE_URL } from "./api";
 
 export const register = (username, password, email) => {
   return fetch(`${BASE_URL}/auth/local/register`, {
