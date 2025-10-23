@@ -80,6 +80,8 @@ function App() {
       .catch(console.error);
   };
 
+  // Authenticate User based on jwt.
+
   // Use an EMPTY dependency array to run once upon page load.
   useEffect(() => {
     // Upon inital page load, check localStorage for a token.
@@ -107,7 +109,7 @@ function App() {
         path="/ducks"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <Ducks />
+            <Ducks setIsLoggedIn={setIsLoggedIn} />
           </ProtectedRoute>
         }
       />
@@ -116,7 +118,7 @@ function App() {
         path="/my-profile"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <MyProfile userData={userData} />
+            <MyProfile setIsLoggedIn={setIsLoggedIn} userData={userData} />
           </ProtectedRoute>
         }
       />

@@ -13,3 +13,8 @@ export const setToken = (token) => {
 export const getToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
+
+// This will remove the JWT token when signing out in NavBar.
+export const removeToken = () => {
+  localStorage.removeItem(TOKEN_KEY);
+};
