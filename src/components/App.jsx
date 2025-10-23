@@ -1,4 +1,10 @@
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 import Ducks from "./Ducks";
 import Login from "./Login";
@@ -44,9 +50,12 @@ function App() {
     }
   };
 
+  // Invoke the hook. It's necessary to invoke the hook in both components.
+  const location = useLocation();
+
   // handleLogin takes one parameter: an object with two properties.
   const handleLogin = ({ username, password }) => {
-    // If the usename or the password is empty, return without sending a request.
+    // If the username or the password is empty, return without sending a request.
     if (!username || !password) {
       return;
     }
@@ -62,10 +71,13 @@ function App() {
           setToken(data.jwt);
           setUserData(data.user); // save user's data to state
           setIsLoggedIn(true); // log the user in
-          navigate("/ducks"); // send them to /ducks
+          // Instead of always directing them to /ducks check if there is saved
+          // state and send them there or default to /ducks.
+          const redirectPath = location.state?.from?.pathname || "/ducks";
+          navigate(redirectPath);
         }
       })
-      .catch(console.err);
+      .catch(console.error);
   };
 
   // Use an EMPTY dependency array to run once upon page load.
@@ -84,7 +96,6 @@ function App() {
         // data to state, and navigate them to /ducks.
         setIsLoggedIn(true);
         setUserData({ username, email });
-        navigate("/ducks");
       })
       .catch(console.error);
   }, []);
@@ -95,7 +106,7 @@ function App() {
       <Route
         path="/ducks"
         element={
-          <ProtectedRoute isLoggedin={isLoggedIn}>
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
             <Ducks />
           </ProtectedRoute>
         }
@@ -104,7 +115,7 @@ function App() {
       <Route
         path="/my-profile"
         element={
-          <ProtectedRoute isLoggedin={isLoggedIn}>
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
             <MyProfile userData={userData} />
           </ProtectedRoute>
         }
@@ -114,20 +125,26 @@ function App() {
       <Route
         path="/login"
         element={
-          <div className="loginContainer">
-            <Login handleLogin={handleLogin} />
-          </div>
+          <ProtectedRoute isLoggedIn={isLoggedIn} anonymous>
+            <div className="loginContainer">
+              <Login handleLogin={handleLogin} />
+            </div>
+          </ProtectedRoute>
         }
       />
+
       {/* In order to exchange data between Register and App we need to pass it the handleRegistration function as a prop. */}
       <Route
         path="/register"
         element={
-          <div className="registerContainer">
-            <Register handleRegistration={handleRegistration} />
-          </div>
+          <ProtectedRoute isLoggedIn={isLoggedIn} anonymous>
+            <div className="registerContainer">
+              <Register handleRegistration={handleRegistration} />
+            </div>
+          </ProtectedRoute>
         }
       />
+
       {/* Catch all route for non existing endpoints */}
       {/* Wildcard catch all symbol '*' */}
       {/* Using a ternary operator to render a Navigate component that redirects
