@@ -14,6 +14,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import * as auth from "../utils/auth";
 import * as api from "../utils/api";
 import { setToken, getToken } from "../utils/token";
+import AppContext from "../context/AppContext";
 import "./styles/App.css";
 
 function App() {
@@ -102,68 +103,77 @@ function App() {
       .catch(console.error);
   }, []);
 
+  // React Context API
+  //What is .Provider?
+  // Think of .Provider like a broadcasting station:
+  // What it does: Takes data and makes it available to ALL components inside it
+  // The value prop: This is what gets "broadcast" - any component inside can "tune in" to receive it
+  // Coverage area: Only components wrapped inside the Provider can access the context
   return (
-    <Routes>
-      {/* Wrap Ducks and MyProfile in ProtectedRoute and pass isLoggedIn a prop. */}
-      <Route
-        path="/ducks"
-        element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <Ducks setIsLoggedIn={setIsLoggedIn} />
-          </ProtectedRoute>
-        }
-      />
+    <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+      {/* Now All child components can access this value 👆*/}
+      <Routes>
+        {/* Wrap Ducks and MyProfile in ProtectedRoute and pass isLoggedIn a prop. */}
+        <Route
+          path="/ducks"
+          element={
+            <ProtectedRoute>
+              <Ducks />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/my-profile"
-        element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <MyProfile setIsLoggedIn={setIsLoggedIn} userData={userData} />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedRoute>
+              <MyProfile userData={userData} />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Pass the handler to the Login component. */}
-      <Route
-        path="/login"
-        element={
-          <ProtectedRoute isLoggedIn={isLoggedIn} anonymous>
-            <div className="loginContainer">
-              <Login handleLogin={handleLogin} />
-            </div>
-          </ProtectedRoute>
-        }
-      />
+        {/* Pass the handler to the Login component. */}
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute anonymous>
+              <div className="loginContainer">
+                <Login handleLogin={handleLogin} />
+              </div>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* In order to exchange data between Register and App we need to pass it the handleRegistration function as a prop. */}
-      <Route
-        path="/register"
-        element={
-          <ProtectedRoute isLoggedIn={isLoggedIn} anonymous>
-            <div className="registerContainer">
-              <Register handleRegistration={handleRegistration} />
-            </div>
-          </ProtectedRoute>
-        }
-      />
+        {/* In order to exchange data between Register and App we need to pass it the handleRegistration function as a prop. */}
+        <Route
+          path="/register"
+          element={
+            <ProtectedRoute anonymous>
+              <div className="registerContainer">
+                <Register handleRegistration={handleRegistration} />
+              </div>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Catch all route for non existing endpoints */}
-      {/* Wildcard catch all symbol '*' */}
-      {/* Using a ternary operator to render a Navigate component that redirects
+        {/* Catch all route for non existing endpoints */}
+        {/* Wildcard catch all symbol '*' */}
+        {/* Using a ternary operator to render a Navigate component that redirects
           the user to the appropritate route depending on the user's authorization. 
           Use the replace prop to avoid sending users in a redirection loop when
           they click the back button in the browser.  */}
-      <Route
-        path="*"
-        element={
-          isLoggedIn ? (
-            <Navigate to="/ducks" replace />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
-    </Routes>
+        <Route
+          path="*"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/ducks" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
+    </AppContext.Provider>
   );
 }
 
